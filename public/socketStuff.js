@@ -3,11 +3,12 @@ function init(){
     socket = io("http://localhost:8080");
     socket.emit("init", { playerName : player.name});
 
+    let tick;
     socket.on("initReturn", (data)=>{
         orbs = data.orbs;
         player.uid = data.uid;
 
-        setInterval(()=>{
+        tick = setInterval(()=>{
             socket.emit("tick", {
                 xVector: player.xVector,
                 yVector: player.yVector,
@@ -28,6 +29,7 @@ function init(){
             if(!isInPlayers) {
                 player.alive = false;
                 $("#spawnModal").modal("show");
+                clearInterval(tick);
                 
                 socket.disconnect();
             }

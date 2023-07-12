@@ -32,7 +32,6 @@ setInterval(()=>{
 io.on("connect", (socket)=>{
     let player = {};
     socket.on("init", (data)=>{
-        console.log("In init");
         let playerConfig = new PlayerConfig(settings);
         let playerData = new PlayerData(socket.id, data.playerName, settings);
         player = new Player(socket.id, playerConfig, playerData);
@@ -98,8 +97,6 @@ io.on("connect", (socket)=>{
     })
 
     socket.on("disconnect", (data)=>{
-        console.log("someone just disconnected");
-        
         if(player.playerData){
             players = players.filter((p)=>{
                 return p.uid !== player.playerData.uid;
