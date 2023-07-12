@@ -11,8 +11,8 @@ app.use(cors({
 app.use(helmet());
 app.use(express.static(path.join(__dirname, "public")));
 
-
-const expressServer = app.listen(8080, ()=>{
+const port = process.env.PORT || 8080;
+const expressServer = app.listen(port, ()=>{
     console.log("server has been started on port 8080");
 })
 
