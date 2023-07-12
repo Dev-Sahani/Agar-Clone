@@ -3,7 +3,11 @@ const app = express();
 const path = require("path");
 const socketIo = require("socket.io");
 const helmet = require("helmet");
+const cors = require('cors');
 
+app.use(cors({
+    origin: '*'
+}));
 app.use(helmet());
 app.use(express.static(path.join(__dirname, "public")));
 
