@@ -10,7 +10,6 @@ const PlayerData = require("./classes/PlayerData");
 
 let orbs = [];
 let players = [];
-
 let settings = {
     defaultOrbs: 3000,
     defaultSpeed: 8,
@@ -49,51 +48,57 @@ io.on("connect", (socket)=>{
         socket.join("game");
     })
 
-    socket.on("tick", data=>{
-        let speed = player.playerConfig.speed;
-        if(!data.xVector || !data.yVector){
-            data.xVector = 0;
-            data.yVector = 0;
-        }        
-        xV = player.playerConfig.xVector = data.xVector;
-        yV = player.playerConfig.yVector = data.yVector;
-
-        player.playerData.locX += (speed * xV);
-        player.playerData.locY -= (speed * yV);
-
-        if(player.playerData.locX < 0){
-            player.playerData.locX = 0;
-        } else if(player.playerData.locX > settings.worldWidth){
-            player.playerData.locX = settings.worldWidth;
+    socket.on("tick", (data)=>{
+        try {
+            let speed = player.playerConfig.speed;
+            if(!data.xVector || !data.yVector){
+                data.xVector = 0;
+                data.yVector = 0;
+            }        
+            xV = player.playerConfig.xVector = data.xVector;
+            yV = player.playerConfig.yVector = data.yVector;
+    
+            player.playerData.locX += (speed * xV);
+            player.playerData.locY -= (speed * yV);
+    
+            if(player.playerData.locX < 0){
+                player.playerData.locX = 0;
+            } else if(player.playerData.locX > settings.worldWidth){
+                player.playerData.locX = settings.worldWidth;
+            }
+    
+            if(player.playerData.locY < 0) {
+                player.playerData.locY = 0;
+            } else if( player.playerData.locY > settings.worldHeight){
+                player.playerData.locY = settings.worldHeight;
+            }
+    
+            let capturedOrb = checkForOrbCollisions(player.playerData,player.playerConfig, orbs, settings);
+            if(capturedOrb){
+                // console.log("collision !!!");
+                const newOrb = new Orb(settings);
+                orbs.splice(capturedOrb, 1, newOrb);
+                
+                io.sockets.emit("updateLeaderboard", getLeaderBoard());
+                io.sockets.emit("orbSwitch", {
+                    orbIndex: capturedOrb, // capturedOrb contain index of removed orb,
+                    newOrb,
+                })
+            }
+    
+            // Player collisions:
+            let playerDeath = checkForPlayerCollisions(player.playerData, player.playerConfig, players, null, player.playerData.uid);
+            // console.log(playerDeath);
+            if(playerDeath){
+                io.sockets.emit("updateLeaderboard", {
+                    ...getLeaderBoard(),
+                });
+                io.sockets.emit("playerDeath", playerDeath);
+            }
         }
-
-        if(player.playerData.locY < 0) {
-            player.playerData.locY = 0;
-        } else if( player.playerData.locY > settings.worldHeight){
-            player.playerData.locY = settings.worldHeight;
-        }
-
-        let capturedOrb = checkForOrbCollisions(player.playerData,player.playerConfig, orbs, settings);
-        if(capturedOrb){
-            // console.log("collision !!!");
-            const newOrb = new Orb(settings);
-            orbs.splice(capturedOrb, 1, newOrb);
-            
-            io.sockets.emit("updateLeaderboard", getLeaderBoard());
-            io.sockets.emit("orbSwitch", {
-                orbIndex: capturedOrb, // capturedOrb contain index of removed orb,
-                newOrb,
-            })
-        }
-
-        // Player collisions:
-        let playerDeath = checkForPlayerCollisions(player.playerData, player.playerConfig, players, null, player.playerData.uid);
-        // console.log(playerDeath);
-        if(playerDeath){
-            io.sockets.emit("updateLeaderboard", {
-                ...getLeaderBoard(),
-            });
-            io.sockets.emit("playerDeath", playerDeath);
+        catch(err){
+            socket.emit("serverError");
+            // console.log("ERROR :inside socket.on('tick', ...)\n", err);
         }
     })
 
