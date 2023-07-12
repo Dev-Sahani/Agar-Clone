@@ -10,13 +10,14 @@ const PlayerData = require("./classes/PlayerData");
 
 let orbs = [];
 let players = [];
+
 let settings = {
-    defaultOrbs: 500,
-    defaultSpeed: 7,
-    defaultSize: 6,
+    defaultOrbs: 3000,
+    defaultSpeed: 8,
+    defaultSize: 8,
     defaultZoom: 1.5,
-    worldWidth: 500,
-    worldHeight: 500,
+    worldWidth: 3000,
+    worldHeight: 3000,
 }
 
 initGame();
