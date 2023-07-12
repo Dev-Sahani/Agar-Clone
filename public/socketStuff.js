@@ -1,7 +1,7 @@
 var socket;
 function init(){
     socket = io("http://localhost:8080");
-    socket.emit("init", { playerName : player.name});
+    socket.emit("init", { playerName : player.name, playerColor: player.color});
 
     let tick;
     socket.on("initReturn", (data)=>{
@@ -68,6 +68,20 @@ function init(){
         });
         $("#game-message").show();
         setTimeout(()=>{$("#game-message").fadeOut()},5000);
+    })
+
+
+    socket.on("serverError", ()=>{
+        document.querySelector("#game-message").innerHTML = "Something went wrong! Server Error\n Please refresh or try again later.";
+        $("#game-message").css({
+            "background-color": "#00e6e6",
+            "opacity": 1,
+        });
+        $("#game-message").show();
+        setTimeout(()=>{$("#game-message").fadeOut()},5000);
+        
+
+        socket.disconnect();
     })
 
     draw();

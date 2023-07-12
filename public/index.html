@@ -54,25 +54,53 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <button type="submit" class="btn play-button btn-github">Login with github</button>
-                    <form class="name-form">
+                    <!-- <button type="submit" class="btn play-button btn-github">Login with github</button> -->
+                    <form id="name-form" class="name-form">
 						<div class="text-center error-message"></div>
-						<button type="submit" class="btn play-button play-guest">Play as Guest</button>
-						<input id="name-input" class="text-input text-center form-control" type="text" name="name-input" placeholder="Enter your name here" required>
-					</form>
+
+                        <div class="input-div">
+                            <label for="name-input" id="name-label">Name :</label>
+                            <input id="name-input" class="text-input text-center form-control" type="text" name="name-input" placeholder="Enter your name here" required>
+                        </div>
+                        <div class="input-div">
+                            <label for="color"> Color :</label>
+                            <select name="color" class="drop-down" id="color-drop-down">
+                                <option value="#FF0000">Red</option>
+                                <option value="#1F75FE">Blue</option>
+                                <option value="#008000">Green</option>
+                                <option value="audi">Orange</option>
+                                <option value="#800080">Purple</option>
+                                <option value="#fd5c63">Pink</option>
+                                <option value="#964B00.">Brown</option>
+                                <option value="#FFFFFF">White</option>
+                                <option value="#808080">Gray</option>
+                                <option value="#66FF00">Light-Green</option>
+                                <option value="#87CEFA">Light-Blue</option>
+                                <option value="#00008B">Dark-Blue</option>
+                                <option value="#13274F">Navy</option>
+                                <option value="#4F7942">Fern Green</option>
+                                <option value="#8B0000">Dark Red</option>
+                                <option value="#D8BFD8">Thistle</option>
+                                <option value="#722F37">Wine</option> 
+                            </select>
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
-					<div id="instructions">
-						<label id="how-to-play">How to play:</label>
+                    <div id="instructions">
+                        <label id="how-to-play">How to play:</label>
 						<ul>
-							<li>Move your mouse on the screen to move your character.</li>
+                            <li>Move your mouse on the screen to move your character.</li>
 							<li>Absorb orbs by running over them in order to grow your character.</li>
 							<li>The larger you get the slower you are.</li>
 							<li>Objective: Absorb other players to get even larger but not lose speed.</li>
 							<li>The larger player absorbs the smaller player.</li>
 						</ul>
 					</div>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div class="input-div">
+                        <button form="name-form" type="submit" class="btn play-button play-guest">Play</button>
+                        <button type="button" lass="btn btn-secondary" style="margin-block: 5px;">Close</button>
+                    </div>
                 </div>
             </div>
         </div>

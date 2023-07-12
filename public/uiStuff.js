@@ -16,6 +16,8 @@ $(window).on("load", ()=>{
 $(".name-form").on("submit", (event)=>{
     event.preventDefault();
     player.name = document.querySelector("#name-input").value;
+    player.color= document.querySelector("#color-drop-down").value;
+    
     $("#loginModal").modal("hide");
     $("#spawnModal").modal("show");
 })

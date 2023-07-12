@@ -33,7 +33,7 @@ io.on("connect", (socket)=>{
     let player = {};
     socket.on("init", (data)=>{
         let playerConfig = new PlayerConfig(settings);
-        let playerData = new PlayerData(socket.id, data.playerName, settings);
+        let playerData = new PlayerData({playerColor: data.playerColor, playerName: data.playerName, settings,});
         player = new Player(socket.id, playerConfig, playerData);
         
         setInterval(()=>{
