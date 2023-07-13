@@ -106,13 +106,16 @@ canvas{
 .play-button{
 	font-size: 20px;	
 	display: block;
-	margin: 5px auto 5px;
-	width: 90%;
+	margin: 5px auto;
+	width: 220px;
 	background-color: #00e6e6;
 	color: #FFFFFF;
 }
 .play-button:hover {
 	background-color: #00a5a5;
+}
+.close-btn {
+	background-color: #00e600;
 }
 
 #join-team-btn, #play-solo-btn, #create-team-btn, #create-play-solo-btn, #add-team-btn{
