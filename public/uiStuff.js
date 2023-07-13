@@ -27,3 +27,7 @@ $(".start-game").on("click", (event)=>{
     $(".hiddenOnStart").removeAttr("hidden");
     init();
 })
+
+$("#join-team-btn").on("click", (event)=>{
+    document.querySelector(".show-on-join-team").removeAttribute("hidden");
+})

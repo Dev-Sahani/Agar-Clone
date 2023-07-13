@@ -131,6 +131,26 @@ canvas{
 	background-color: #00e600;
 }
 
+.show-on-join-team {
+	padding-inline: 16px;
+}
+.enter-room-div {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+.enter-room-div input {
+	margin: 0px 15px 0px;
+}
+.show-on-join-team button {
+	padding-block: 3px;
+	height: 42px;
+}
+.show-on-join-team p {
+	text-align: center;
+	color: gray;
+	margin: 0px;
+}
 .btn-github{
 	background-image: url("/images/GitHub-Mark-Light-32px.png") !important;
 	color: #fff;
