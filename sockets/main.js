@@ -8,24 +8,25 @@ const Player = require("./classes/Player");
 const PlayerConfig = require("./classes/PlayerConfig");
 const PlayerData = require("./classes/PlayerData");
 
-let orbs = [];
-let players = [];
+let orbs = {}; // object = {room : [orbs...]}
+let players = {}; // object = {room : [players...]}
 let settings = {
-    defaultOrbs: 3000,
+    defaultOrbs: 500,
     defaultSpeed: 8,
     defaultSize: 8,
     defaultZoom: 1.5,
-    worldWidth: 3000,
-    worldHeight: 3000,
+    worldWidth: 500,
+    worldHeight: 500,
 }
 
-initGame();
 
 setInterval(()=>{
-    if(players.length > 0){
-        io.to("game").emit("tock", {
-            players,
-        });
+    for(let room in players){
+        if(players[room].length > 0){
+            io.to(room).emit("tock", {
+                players: players[room],
+            });
+        }
     }
 }, 33);
 
@@ -33,21 +34,31 @@ io.on("connect", (socket)=>{
     let player = {};
     socket.on("init", (data)=>{
         let playerConfig = new PlayerConfig(settings);
-        let playerData = new PlayerData({playerColor: data.playerColor, playerName: data.playerName, settings,});
+        // console.log("socket.id = ", socket.id);
+        let playerData = new PlayerData({socketId: socket.id, playerColor: data.playerColor, playerName: data.playerName, settings, room: data.room,});
         player = new Player(socket.id, playerConfig, playerData);
         
-        setInterval(()=>{
-            socket.emit("tickTok", {
+        // players.push(playerData)
+        if(player.playerData.room in players){
+            players[player.playerData.room].push(playerData);
+        } else {
+            players[player.playerData.room] = [playerData];
+        }
+        socket.join(player.playerData.room);
+        if(!(player.playerData.room in orbs)){
+            createOrbs(player.playerData.room);
+        }
+        socket.emit("initReturn", { orbs: orbs[player.playerData.room], uid: player.playerData.uid, room: player.playerData.room});
+        // console.log(io.sockets.adapter.rooms);
+        setInterval(()=>{   
+            // socket.to(<room already joined by the player>).emit("tickTok", {..}) => not working
+            io.to(socket.id).emit("tickTok", {
                 playerX: player.playerData.locX,
                 playerY: player.playerData.locY,
             });
-        }, 33);
-
-        socket.emit("initReturn", { orbs, uid: player.playerData.uid});
-        players.push(playerData);
-        socket.join("game");
+        }, 33);    
     })
-
+    
     socket.on("tick", (data)=>{
         try {
             let speed = player.playerConfig.speed;
@@ -73,27 +84,26 @@ io.on("connect", (socket)=>{
                 player.playerData.locY = settings.worldHeight;
             }
     
-            let capturedOrb = checkForOrbCollisions(player.playerData,player.playerConfig, orbs, settings);
-            if(capturedOrb){
+            let capturedOrb = checkForOrbCollisions(player.playerData,player.playerConfig, orbs[player.playerData.room], settings);
+            if(capturedOrb || capturedOrb === 0){
                 // console.log("collision !!!");
                 const newOrb = new Orb(settings);
-                orbs.splice(capturedOrb, 1, newOrb);
+                orbs[player.playerData.room].splice(capturedOrb, 1, newOrb);
                 
-                io.sockets.emit("updateLeaderboard", getLeaderBoard());
-                io.sockets.emit("orbSwitch", {
+                io.sockets.in(player.playerData.room).emit("updateLeaderboard", getLeaderBoard(player.playerData.room));
+                io.sockets.in(player.playerData.room).emit("orbSwitch", {
                     orbIndex: capturedOrb, // capturedOrb contain index of removed orb,
                     newOrb,
                 })
             }
     
             // Player collisions:
-            let playerDeath = checkForPlayerCollisions(player.playerData, player.playerConfig, players, null, player.playerData.uid);
+            // let playerDeath = checkForPlayerCollisions(player.playerData, player.playerConfig, players, null, player.playerData.uid);
+            let playerDeath = checkForPlayerCollisions(player.playerData, player.playerConfig, players[player.playerData.room], null, player.playerData.uid);
             // console.log(playerDeath);
             if(playerDeath){
-                io.sockets.emit("updateLeaderboard", {
-                    ...getLeaderBoard(),
-                });
-                io.sockets.emit("playerDeath", playerDeath);
+                io.sockets.in(player.playerData.room).emit("updateLeaderboard", getLeaderBoard(player.playerData.room),);
+                io.sockets.in(player.playerData.room).emit("playerDeath", playerDeath);
             }
         }
         catch(err){
@@ -103,20 +113,21 @@ io.on("connect", (socket)=>{
     })
 
     socket.on("disconnect", (data)=>{
+        // console.log("someone discconected !");
         if(player.playerData){
-            players = players.filter((p)=>{
+            players[player.playerData.room] = players[player.playerData.room].filter((p)=>{
                 return p.uid !== player.playerData.uid;
             })
-            io.sockets.emit("updateLeaderboard", getLeaderBoard());
+            io.sockets.in(player.playerData.room).emit("updateLeaderboard", getLeaderBoard(player.playerData.room));
         }
     })
 })
 
-function getLeaderBoard(){
-    players.sort((a,b)=>{
+function getLeaderBoard(room){
+    players[room].sort((a,b)=>{
         return b.score - a.score ;
     })
-    let leaderBoard = players.map((p)=>{
+    let leaderBoard = players[room].map((p)=>{
         return {
             name: p.name,
             score: p.score,
@@ -126,9 +137,12 @@ function getLeaderBoard(){
     return leaderBoard;
 }
 
-function initGame(){
+function createOrbs(room){
+    if(!(room in orbs)){
+        orbs[room] = [];
+    }
     for(let i=0; i < settings.defaultOrbs; i++){
-        orbs.push(new Orb(settings));
+        orbs[room].push(new Orb(settings));
     }
 }
 

@@ -1,13 +1,15 @@
 var socket;
 function init(){
     socket = io("http://localhost:8080");
-    socket.emit("init", { playerName : player.name, playerColor: player.color});
+    socket.emit("init", { playerName : player.name, playerColor: player.color, room: player.room});
 
     let tick;
     socket.on("initReturn", (data)=>{
         orbs = data.orbs;
         player.uid = data.uid;
-
+        player.room = data.room;
+        player.alive = true;
+        document.querySelector(".player-room").innerText = `${player.room}`;
         tick = setInterval(()=>{
             socket.emit("tick", {
                 xVector: player.xVector,
@@ -18,23 +20,24 @@ function init(){
         
     })
     
-    socket.on("tock", (data)=>{
-        // console.log(data.players);
-        players = data.players;
-
-        if(player.uid){
-            const isInPlayers = players.find((p)=>{
-                return (p.uid === player.uid);
-            })
-            if(!isInPlayers) {
-                player.alive = false;
-                $("#spawnModal").modal("show");
-                clearInterval(tick);
-                
-                socket.disconnect();
+        socket.on("tock", (data)=>{
+            players = data.players;
+            
+            if(player.uid){
+                const isInPlayers = players.find((p)=>{
+                    return (p.uid === player.uid);
+                })
+                if(player.alive && !isInPlayers) {
+                    console.log(data);
+                    player.alive = false;
+                    $("#spawnModal").modal("show");
+                    $("#welcome-msg").html("Game Over!");
+                    clearInterval(tick);
+                    
+                    socket.disconnect();
+                }
             }
-        }
-    })
+        })
     
     socket.on("tickTok", (data)=>{
         player.locX = data.playerX;

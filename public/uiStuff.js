@@ -22,12 +22,35 @@ $(".name-form").on("submit", (event)=>{
     $("#spawnModal").modal("show");
 })
 
-$(".start-game").on("click", (event)=>{
-    $(".modal").modal("hide");
-    $(".hiddenOnStart").removeAttr("hidden");
-    init();
+$(".start-game").on("click", ()=>{
+    player.room = "global";
+    startGame();
 })
 
 $("#join-team-btn").on("click", (event)=>{
     document.querySelector(".show-on-join-team").removeAttribute("hidden");
 })
+
+$(".create-room-btn").on("click", (event)=>{
+    player.room = "createIt";
+    startGame();
+})
+$(".enter-room-btn").on("click", (event)=>{
+    const roomId = document.querySelector("#room-id").value;
+    console.log(roomId);
+    if(!roomId || roomId === ""){
+        console.log("inside blank room-id")
+        document.querySelector("#room-id").value = "Please Enter a room-id";
+    } else if(roomId === "global"){
+        document.querySelector("#room-id").value = "Room id not available.";
+    } else {
+        player.room = roomId;
+        startGame();
+    }
+})
+
+function startGame(event){
+    $(".modal").modal("hide");
+    $(".hiddenOnStart").removeAttr("hidden");
+    init();
+}

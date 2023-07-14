@@ -138,9 +138,20 @@ canvas{
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	justify-content: center;
+}
+.enter-room-btn {
+	border-radius: 0px 5px 5px 0px;
+	padding-inline: 11px;
 }
 .enter-room-div input {
-	margin: 0px 15px 0px;
+	border-right: 0px;
+	border-radius: 5px 0px 0px 5px;
+	margin: 0px;
+	width: 67%;
+}
+.create-room-btn {
+	width: 90%;
 }
 .show-on-join-team button {
 	padding-block: 3px;

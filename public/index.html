@@ -20,6 +20,10 @@
 			<div id="score-wrapper" class="hiddenOnStart" hidden>
 				<div>Score: <span class="player-score"></span></div>
 			</div>
+            <div id="score-wrapper" class="hiddenOnStart" style="top: 65px;" hidden>
+				<div>Room: <span class="player-room"></span></div>
+			</div>
+            
 			<div id="leader-board-wrapper" class="hiddenOnStart" hidden>
 				<div id="leader-board">
 					<h3 class="text-center">Leaders</h3>
@@ -68,7 +72,7 @@
                                 <option value="#FF0000">Red</option>
                                 <option value="#1F75FE">Blue</option>
                                 <option value="#008000">Green</option>
-                                <option value="audi">Orange</option>
+                                <option value="#FFA500">Orange</option>
                                 <option value="#800080">Purple</option>
                                 <option value="#fd5c63">Pink</option>
                                 <option value="#964B00.">Brown</option>
@@ -115,7 +119,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <h3 class="text-center">Welcome<span class="player-name"></span>!</h3>
+                <h3 class="text-center" id="welcome-msg">Welcome<span class="player-name"></span>!</h3>
                 <div class="play-btn-wrapper">
                     <button id="join-team-btn" type="button" class="btn play-button">Join a Team!</button>
                     <button id="play-solo-btn" type="button" class="btn play-button start-game">Play Solo!</button>
@@ -127,11 +131,11 @@
             </div>
             <div class="show-on-join-team" hidden>
                 <div class="enter-room-div">
-                    <input type="text" name="roomId" class="text-input"/>
+                    <input type="text" name="roomId" id="room-id" class="text-input"/>
                     <button class="btn btn-secondary close-btn enter-room-btn" type="button">Enter Room</button>
                 </div>
                 <p>OR</p>
-                <button type="button" class="btn play-button">Create new Room</button>
+                <button type="button" class="btn play-button create-room-btn">Create new Room</button>
             </div>
             <div class="modal-footer">
                 <div id="instructions">

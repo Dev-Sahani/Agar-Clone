@@ -41,7 +41,7 @@ const checkForPlayerCollisions = (pData,pConfig,players,playersForUsers,playerId
     for(let i = 0; i<players.length; i++){
         const p = players[i];
         // console.log(p, playerId);
-        if(p.uid && p.uid !== playerId){ //Added p.socketId test in case player has been removed from players
+        if(p.uid && p.uid !== playerId && pData.room === p.room){ //Added p.socketId test in case player has been removed from players
             let pLocx = p.locX;
             let pLocy = p.locY;
             let pR = p.radius;

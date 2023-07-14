@@ -20,13 +20,15 @@ function draw(){
     // context.stroke();
 
     players.forEach((p)=>{
-        context.beginPath();
-        context.fillStyle = p.color;
-        context.arc(p.locX, p.locY, p.radius, 0, Math.PI*2);
-        context.fill();
-        context.lineWidth = 3;
-        context.strokeStyle = "rgb(200, 150, 0)";
-        context.stroke();
+        if(player.room && p.room === player.room){
+            context.beginPath();
+            context.fillStyle = p.color;
+            context.arc(p.locX, p.locY, p.radius, 0, Math.PI*2);
+            context.fill();
+            context.lineWidth = 3;
+            context.strokeStyle = "rgb(200, 150, 0)";
+            context.stroke();
+        }
     })
 
     orbs.forEach((orb)=>{
