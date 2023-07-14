@@ -11,12 +11,12 @@ const PlayerData = require("./classes/PlayerData");
 let orbs = {}; // object = {room : [orbs...]}
 let players = {}; // object = {room : [players...]}
 let settings = {
-    defaultOrbs: 500,
+    defaultOrbs: 1000,
     defaultSpeed: 8,
     defaultSize: 8,
     defaultZoom: 1.5,
-    worldWidth: 500,
-    worldHeight: 500,
+    worldWidth: 3000,
+    worldHeight: 3000,
 }
 
 
