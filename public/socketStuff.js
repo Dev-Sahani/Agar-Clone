@@ -1,6 +1,6 @@
 var socket;
 function init(){
-    socket = io("http://localhost:8080");
+    socket = io("https://agar-clone-gumc.onrender.com");
     socket.emit("init", { playerName : player.name, playerColor: player.color, room: player.room});
 
     let tick;
