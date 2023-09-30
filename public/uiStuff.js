@@ -3,6 +3,7 @@ let wWidth = $(window).width();
 let player = {};
 let orbs = [];
 let players = [];
+let powers = [];
 
 let canvas = document.querySelector("#the-canvas");
 let context = canvas.getContext("2d");

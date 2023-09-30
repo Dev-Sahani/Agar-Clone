@@ -256,6 +256,11 @@ canvas{
 	font-size: 18px
 }
 
+.images {
+	position: absolute;
+	display: none;
+}
+
 #game-message-wrapper{
 	position: fixed;
 	width: 100%;

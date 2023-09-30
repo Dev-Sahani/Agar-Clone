@@ -90,4 +90,40 @@ const checkForPlayerCollisions = (pData,pConfig,players,playersForUsers,playerId
     return null;
 }
 
-module.exports = {checkForOrbCollisions, checkForPlayerCollisions}
+const checkForPowerCollisions = ({player, powers})=>{
+    //PLAYER COLLISIONS	
+    // console.log(pData, pConfig, players, playersForUsers, playerId);
+    let playerData = player.playerData, playerConfig = player.playerConfig;
+
+    for(let i = 0; i<powers.length; i++){
+        const power = powers[i];
+        // console.log(p, playerId);
+
+        let powLocx = power.locX;
+        let powLocy = power.locY;
+        let powR = power.radius;
+        // ABB Test - Axis-aligned bounding boxes
+        if(playerData.locX + playerData.radius + powR > powLocx
+        && playerData.locX < powLocx + playerData.radius + powR
+        && playerData.locY + playerData.radius + powR > powLocy 
+        && playerData.locY < powLocy + playerData.radius + powR){
+            // console.log("Hit square test!");
+            // Pythagoras test
+            distance = Math.sqrt(
+                ((playerData.locX - powLocx) * (playerData.locX - powLocx)) + 
+                ((playerData.locY - powLocy) * (playerData.locY - powLocy))	
+                );      
+            if(distance < playerData.radius + powR){
+                //COLLISION!!
+                return i;
+            }
+                
+                //This code could check to see if it the player who tocked was hit.
+                //It is commented out since the above code should run on the other player's tock 
+                //In other words, we only need to consider it a "death" on the attacking players turn
+                // else if(playerData.radius < pR){ }
+        }
+    }
+    return null;
+}
+module.exports = {checkForOrbCollisions, checkForPlayerCollisions, checkForPowerCollisions}

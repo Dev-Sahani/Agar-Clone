@@ -1,6 +1,8 @@
 var socket;
 function init(){
-    socket = io("https://agar-clone-gumc.onrender.com");
+    // socket = io("https://agar-clone-gumc.onrender.com");
+    socket = io("http://localhost:8080");
+
     socket.emit("init", { playerName : player.name, playerColor: player.color, room: player.room});
 
     let tick;
@@ -9,6 +11,8 @@ function init(){
         player.uid = data.uid;
         player.room = data.room;
         player.alive = true;
+        powers = data.powers;
+        console.log(powers);
         document.querySelector(".player-room").innerText = `${player.room}`;
         tick = setInterval(()=>{
             socket.emit("tick", {
@@ -60,6 +64,13 @@ function init(){
         
     })
     
+    socket.on("powerAbsorbed", (data)=>{
+        // data.powerGained is indx of power absorbed by any player
+        // Note that the powerGained is not the indx of power gained by this player, 
+        // it is indx of any power which has absorbed.
+        powers.splice(data.powerGained, 1, data.newPower);
+    });
+
     socket.on("playerDeath", (data)=>{
         console.log("Got Killed :", data.absorbed);
         console.log("Killed by :", data.absorbedBy);

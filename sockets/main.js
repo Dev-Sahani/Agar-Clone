@@ -1,20 +1,24 @@
 const io = require("../server").io;
 const checkForOrbCollisions = require("./checkCollision").checkForOrbCollisions;
 const checkForPlayerCollisions = require("./checkCollision").checkForPlayerCollisions;
-
+const checkForPowerCollisions = require("./checkCollision").checkForPowerCollisions;
 //  ================ Classes =====================
 const Orb = require("./classes/Orb");
 const Player = require("./classes/Player");
 const PlayerConfig = require("./classes/PlayerConfig");
 const PlayerData = require("./classes/PlayerData");
+const Power = require("./classes/Powers");
 
 let orbs = {}; // object = {room : [orbs...]}
 let players = {}; // object = {room : [players...]}
+let powers = {}; // powers = {room: [power...]}
 let settings = {
     defaultOrbs: 1000,
     defaultSpeed: 8,
     defaultSize: 8,
     defaultZoom: 1.5,
+    defaultPowerSize: 50,
+    defaultNumberOfPowers: 6,
     worldWidth: 3000,
     worldHeight: 3000,
 }
@@ -22,10 +26,14 @@ let settings = {
 
 setInterval(()=>{
     for(let room in players){
-        if(players[room].length > 0){
-            io.to(room).emit("tock", {
-                players: players[room],
-            });
+        try{
+            if(players[room].length > 0){
+                io.to(room).emit("tock", {
+                    players: players[room],
+                });
+            }
+        } catch(err) {
+            console.log("ERROR \n");
         }
     }
 }, 33);
@@ -44,11 +52,23 @@ io.on("connect", (socket)=>{
         } else {
             players[player.playerData.room] = [playerData];
         }
+
         socket.join(player.playerData.room);
+
         if(!(player.playerData.room in orbs)){
             createOrbs(player.playerData.room);
         }
-        socket.emit("initReturn", { orbs: orbs[player.playerData.room], uid: player.playerData.uid, room: player.playerData.room});
+
+        if(!(player.playerData.room in powers)) {
+            createPowers(player.playerData.room);
+        }
+
+        socket.emit("initReturn", { 
+            orbs: orbs[player.playerData.room], 
+            uid: player.playerData.uid, 
+            room: player.playerData.room,
+            powers: powers[player.playerData.room],
+        });
         // console.log(io.sockets.adapter.rooms);
         setInterval(()=>{   
             // socket.to(<room already joined by the player>).emit("tickTok", {..}) => not working
@@ -61,7 +81,7 @@ io.on("connect", (socket)=>{
     
     socket.on("tick", (data)=>{
         try {
-            let speed = player.playerConfig.speed;
+            let speed = player.playerConfig.speed + player.playerConfig.extraSpeed;
             if(!data.xVector || !data.yVector){
                 data.xVector = 0;
                 data.yVector = 0;
@@ -97,6 +117,24 @@ io.on("connect", (socket)=>{
                 })
             }
     
+            const powerGained = checkForPowerCollisions({player, powers: powers[player.playerData.room]});
+            if(powerGained || powerGained === 0) {
+                const power = powers[player.playerData.room][powerGained];
+                switch(power.powerName) {
+                    case "speedPower":
+                        player.playerConfig.setExtraSpeed();
+                        break;
+                    case "invisiblePower":
+                        player.playerData.setInvisibility();
+                        break;
+                    default:
+                        player.playerData.setExtraRadius();
+                        break;
+                }
+                const newPower = new Power({settings});
+                powers[player.playerData.room].splice(powerGained, 1, newPower);
+                io.sockets.in(player.playerData.room).emit("powerAbsorbed", {powerGained, newPower});
+            }
             // Player collisions:
             // let playerDeath = checkForPlayerCollisions(player.playerData, player.playerConfig, players, null, player.playerData.uid);
             let playerDeath = checkForPlayerCollisions(player.playerData, player.playerConfig, players[player.playerData.room], null, player.playerData.uid);
@@ -107,8 +145,8 @@ io.on("connect", (socket)=>{
             }
         }
         catch(err){
-            socket.emit("serverError");
-            // console.log("ERROR :inside socket.on('tick', ...)\n", err);
+            socket.emit("serverError"); 
+            console.log("ERROR :inside socket.on('tick', ...)\n", err);
         }
     })
 
@@ -146,4 +184,12 @@ function createOrbs(room){
     }
 }
 
+function createPowers(room) {
+    if(!(room in powers)) {
+        powers[room] = [];
+    }
+    for(let i=0; i<settings.defaultNumberOfPowers; i++) {
+        powers[room].push(new Power({settings}))
+    }
+}
 module.exports = io;

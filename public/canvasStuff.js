@@ -1,3 +1,8 @@
+const images = {
+    invisiblePower: document.getElementById("invisible-power-img"),
+    speedPower: document.getElementById("speed-power-img"),
+    shootPower: document.getElementById("size-power-img"),
+}
 
 function draw(){
 
@@ -21,6 +26,7 @@ function draw(){
 
     players.forEach((p)=>{
         if(player.room && p.room === player.room){
+            if(player.uid !== p.uid && p.invisible) return;
             context.beginPath();
             context.fillStyle = p.color;
             context.arc(p.locX, p.locY, p.radius, 0, Math.PI*2);
@@ -38,6 +44,10 @@ function draw(){
         context.fill();
     })
 
+    powers.forEach((power) =>{
+        context.beginPath();    
+        context.drawImage(images[power.powerName], power.locX, power.locY, power.radius, power.radius);
+    })
     requestAnimationFrame(draw);
 }
 
